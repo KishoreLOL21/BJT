@@ -1,28 +1,68 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Search, Filter, Grid, List, Play, Heart, Share2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { useState } from "react";
+import {
+  Search,
+  Filter,
+  Grid,
+  List,
+  Play,
+  Heart,
+  Share2,
+  Plus,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
+import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
 
   const featuredMetrics = [
-    { label: 'Videos Discovered', value: '2.5M+', color: 'from-blue-500 to-cyan-500' },
-    { label: 'Active Users', value: '150K+', color: 'from-pink-500 to-rose-500' },
-    { label: 'Playlists Created', value: '45K+', color: 'from-orange-500 to-amber-500' },
-    { label: 'Hours Watched', value: '1.2M+', color: 'from-purple-500 to-indigo-500' },
+    {
+      label: "Videos Discovered",
+      value: "2.5M+",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      label: "Active Users",
+      value: "150K+",
+      color: "from-pink-500 to-rose-500",
+    },
+    {
+      label: "Playlists Created",
+      value: "45K+",
+      color: "from-orange-500 to-amber-500",
+    },
+    {
+      label: "Hours Watched",
+      value: "1.2M+",
+      color: "from-purple-500 to-indigo-500",
+    },
   ];
 
   const trendingCategories = [
-    'Music', 'Gaming', 'Education', 'Technology', 'Entertainment', 'Sports', 'News', 'Comedy'
+    "Music",
+    "Gaming",
+    "Education",
+    "Technology",
+    "Entertainment",
+    "Sports",
+    "News",
+    "Comedy",
   ];
 
   return (
@@ -35,9 +75,9 @@ export default function Home() {
               <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                 <Play className="w-5 h-5 text-purple-600" />
               </div>
-              <h1 className="text-2xl font-bold text-white">VideoHub</h1>
+              <h1 className="text-2xl font-bold text-white">EduCurate</h1>
             </div>
-            
+
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
@@ -79,9 +119,12 @@ export default function Home() {
                 </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
-            
+
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-white hover:text-white/80 hover:bg-white/10">
+              <Button
+                variant="ghost"
+                className="text-white hover:text-white/80 hover:bg-white/10"
+              >
                 Sign In
               </Button>
               <Button className="bg-white text-purple-600 hover:bg-white/90">
@@ -103,9 +146,11 @@ export default function Home() {
               </span>
             </h2>
             <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
-              Search, filter, and organize YouTube videos with powerful tools. Create playlists, save favorites, and discover content that matters to you.
+              Search, filter, and organize YouTube videos with powerful tools.
+              Create playlists, save favorites, and discover content that
+              matters to you.
             </p>
-            
+
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto mb-16">
               <div className="relative">
@@ -135,17 +180,17 @@ export default function Home() {
               </Button>
               <div className="flex items-center space-x-2">
                 <Button
-                  variant={viewMode === 'grid' ? "default" : "outline"}
+                  variant={viewMode === "grid" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                 >
                   <Grid className="w-4 h-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? "default" : "outline"}
+                  variant={viewMode === "list" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className="bg-white/10 border-white/20 text-white hover:bg-white/20"
                 >
                   <List className="w-4 h-4" />
@@ -158,31 +203,48 @@ export default function Home() {
 
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden">
-          <CardHeader className="text-center pb-8">
-            <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
-              Platform Statistics
-            </CardTitle>
-            <p className="text-gray-600">See how our community is growing</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {featuredMetrics.map((metric, index) => (
-                <div key={index} className="text-center">
-                  <div className="relative w-32 h-32 mx-auto mb-4">
-                    <div className="absolute inset-0 rounded-full bg-gray-100"></div>
-                    <div className={`absolute inset-0 rounded-full bg-gradient-to-r ${metric.color} opacity-20`}></div>
-                    <div className="absolute inset-4 rounded-full bg-white flex items-center justify-center">
-                      <span className="text-2xl font-bold text-gray-800">{metric.value}</span>
+        <CardContainer className="inter-var w-full">
+          <CardBody className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden group/card w-full h-auto">
+            {/* Card Header */}
+            <CardItem translateZ="50" className="text-center pb-8 pt-8 px-6">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                Platform Statistics
+              </h2>
+              <p className="text-gray-600">See how our community is growing</p>
+            </CardItem>
+
+            {/* Card Content - Metrics Grid */}
+            <CardItem translateZ="40" className="px-6 pb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {featuredMetrics.map((metric, index) => (
+                  <CardItem
+                    key={index}
+                    translateZ={20 + index * 5} // Staggered depth effect
+                    className="text-center"
+                  >
+                    <div className="relative w-32 h-32 mx-auto mb-4">
+                      <div className="absolute inset-0 rounded-full bg-gray-100"></div>
+                      <div
+                        className={`absolute inset-0 rounded-full bg-gradient-to-r ${metric.color} opacity-20`}
+                      ></div>
+                      <div className="absolute inset-4 rounded-full bg-white flex items-center justify-center group-hover/card:scale-110 transition-transform">
+                        <span className="text-2xl font-bold text-gray-800">
+                          {metric.value}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">{metric.label}</h3>
-                  <div className={`h-1 w-16 mx-auto rounded-full bg-gradient-to-r ${metric.color}`}></div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                      {metric.label}
+                    </h3>
+                    <div
+                      className={`h-1 w-16 mx-auto rounded-full bg-gradient-to-r ${metric.color} group-hover/card:scale-x-125 transition-transform`}
+                    ></div>
+                  </CardItem>
+                ))}
+              </div>
+            </CardItem>
+          </CardBody>
+        </CardContainer>
       </div>
 
       {/* Trending Categories */}
@@ -216,26 +278,34 @@ export default function Home() {
           {[
             {
               icon: Heart,
-              title: 'Save Favorites',
-              description: 'Keep track of your favorite videos and never lose them again.'
+              title: "Save Favorites",
+              description:
+                "Keep track of your favorite videos and never lose them again.",
             },
             {
               icon: Plus,
-              title: 'Create Playlists',
-              description: 'Organize videos into custom playlists for easy access.'
+              title: "Create Playlists",
+              description:
+                "Organize videos into custom playlists for easy access.",
             },
             {
               icon: Share2,
-              title: 'Share & Discover',
-              description: 'Share your discoveries with friends and find new content.'
-            }
+              title: "Share & Discover",
+              description:
+                "Share your discoveries with friends and find new content.",
+            },
           ].map((feature, index) => (
-            <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+            <Card
+              key={index}
+              className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+            >
               <CardContent className="p-8 text-center">
                 <div className="w-16 h-16 mx-auto mb-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
                   <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">{feature.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                  {feature.title}
+                </h3>
                 <p className="text-gray-600">{feature.description}</p>
               </CardContent>
             </Card>
@@ -251,17 +321,27 @@ export default function Home() {
               <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
                 <Play className="w-5 h-5 text-purple-600" />
               </div>
-              <h3 className="text-2xl font-bold text-white">VideoHub</h3>
+              <h3 className="text-2xl font-bold text-white">EduCurate</h3>
             </div>
-            <p className="text-white/80 mb-8">Discover, organize, and enjoy YouTube content like never before.</p>
+            <p className="text-white/80 mb-8">
+              Discover, organize, and enjoy YouTube content like never before.
+            </p>
             <div className="flex flex-wrap justify-center gap-6 text-white/80">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#" className="hover:text-white transition-colors">
+                Privacy Policy
+              </a>
               <Separator orientation="vertical" className="h-4 bg-white/20" />
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+              <a href="#" className="hover:text-white transition-colors">
+                Terms of Service
+              </a>
               <Separator orientation="vertical" className="h-4 bg-white/20" />
-              <a href="#" className="hover:text-white transition-colors">Support</a>
+              <a href="#" className="hover:text-white transition-colors">
+                Support
+              </a>
               <Separator orientation="vertical" className="h-4 bg-white/20" />
-              <a href="#" className="hover:text-white transition-colors">API</a>
+              <a href="#" className="hover:text-white transition-colors">
+                API
+              </a>
             </div>
           </div>
         </div>
