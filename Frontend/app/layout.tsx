@@ -5,22 +5,22 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'VideoHub - YouTube Content Discovery Platform',
+  title: 'EduCurate - YouTube Content Discovery Platform',
   description: 'Discover, organize, and enjoy YouTube content like never before. Search, filter, and create custom playlists with advanced tools.',
   keywords: 'YouTube, videos, search, discovery, playlists, content, streaming',
-  authors: [{ name: 'VideoHub Team' }],
+  authors: [{ name: 'EduCurate Team' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
   openGraph: {
-    title: 'VideoHub - YouTube Content Discovery Platform',
+    title: 'EduCurate - YouTube Content Discovery Platform',
     description: 'Discover, organize, and enjoy YouTube content like never before.',
     type: 'website',
-    url: 'https://videohub.app',
-    siteName: 'VideoHub',
+    url: 'https://EduCurate.app',
+    siteName: 'EduCurate',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VideoHub - YouTube Content Discovery Platform',
+    title: 'EduCurate - YouTube Content Discovery Platform',
     description: 'Discover, organize, and enjoy YouTube content like never before.',
   },
 };

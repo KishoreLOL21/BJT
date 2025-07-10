@@ -10,6 +10,7 @@ import {
   Heart,
   Share2,
   Plus,
+  Router,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,8 +26,11 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
@@ -63,6 +67,34 @@ export default function Home() {
     "Sports",
     "News",
     "Comedy",
+  ];
+
+  const features = [
+    {
+      icon: Heart,
+      title: "Save Favorites",
+      description:
+        "Keep track of your favorite videos and never lose them again.",
+      colors: [
+        [236, 72, 153],
+        [232, 121, 249],
+      ],
+    },
+    {
+      icon: Plus,
+      title: "Create Playlists",
+      description: "Organize videos into custom playlists for easy access.",
+      colors: [[125, 211, 252]],
+    },
+    {
+      icon: Share2,
+      title: "Share & Discover",
+      description: "Share your discoveries with friends and find new content.",
+      colors: [
+        [110, 231, 183],
+        [16, 185, 129],
+      ],
+    },
   ];
 
   return (
@@ -124,18 +156,19 @@ export default function Home() {
               <Button
                 variant="ghost"
                 className="text-white hover:text-white/80 hover:bg-white/10"
+                onClick = {() => router.push("/sign-in")}
               >
-                Sign In
+                Sign Up
               </Button>
               <Button className="bg-white text-purple-600 hover:bg-white/90">
-                Get Started
+                Login
               </Button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Body Section */}
       <div className="relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="text-center">
