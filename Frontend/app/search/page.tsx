@@ -1,4 +1,4 @@
-import SearchContent from '@/components/SearchContent'
+import SearchContent from '@/components/search/SearchContent'
 import React from 'react'
 
 const page = () => {

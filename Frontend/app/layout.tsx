@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'EduCurate Team' }],
   viewport: 'width=device-width, initial-scale=1',
   robots: 'index, follow',
+  metadataBase: new URL('http://localhost:3000'), 
   openGraph: {
     title: 'EduCurate - YouTube Content Discovery Platform',
     description: 'Discover, organize, and enjoy YouTube content like never before.',
