@@ -20,6 +20,7 @@ interface VideoCardProps {
   onAddToPlaylist?: (videoId: string) => void;
   onToggleFavorite?: (videoId: string) => void;
   onShare?: (videoId: string) => void;
+  onClick?: () => void;
 }
 
 export default function VideoCard({ video, onAddToPlaylist, onToggleFavorite, onShare }: VideoCardProps) {
@@ -32,17 +33,14 @@ export default function VideoCard({ video, onAddToPlaylist, onToggleFavorite, on
   };
 
   const formatDuration = (duration: string) => {
-    // Convert duration to readable format
     return duration;
   };
 
   const formatViews = (views: string) => {
-    // Format view count (e.g., 1.2M, 500K)
     return views;
   };
 
   const timeAgo = (publishedAt: string) => {
-    // Calculate time ago
     return '2 days ago';
   };
 
@@ -119,7 +117,7 @@ export default function VideoCard({ video, onAddToPlaylist, onToggleFavorite, on
         <div className="flex items-start space-x-3">
           <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
             <span className="text-white font-semibold text-sm">
-              {video.channel.charAt(0).toUpperCase()}
+              {video.channel?.charAt(0)?.toUpperCase() || "?"}
             </span>
           </div>
           

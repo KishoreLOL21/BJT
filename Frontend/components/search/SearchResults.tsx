@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import VideoCard from '@/components/video/VideoCard';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Grid, List, Loader2 } from 'lucide-react';
+import { useState } from "react";
+import VideoCard from "@/components/video/VideoCard";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Grid, List, Loader2 } from "lucide-react";
 
 interface Video {
   id: string;
@@ -21,19 +21,20 @@ interface Video {
 interface SearchResultsProps {
   videos: Video[];
   isLoading: boolean;
-  viewMode: 'grid' | 'list';
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  viewMode: "grid" | "list";
+  onViewModeChange: (mode: "grid" | "list") => void;
   onLoadMore: () => void;
   hasMore: boolean;
+  onVideoClick: (videoId: string) => void;
 }
 
-export default function SearchResults({ 
-  videos, 
-  isLoading, 
-  viewMode, 
-  onViewModeChange, 
+export default function SearchResults({
+  videos,
+  isLoading,
+  viewMode,
+  onViewModeChange,
   onLoadMore,
-  hasMore 
+  hasMore,
 }: SearchResultsProps) {
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -44,18 +45,15 @@ export default function SearchResults({
   };
 
   const handleAddToPlaylist = (videoId: string) => {
-    // TODO: Implement playlist functionality
-    console.log('Add to playlist:', videoId);
+    console.log("Add to playlist:", videoId);
   };
 
   const handleToggleFavorite = (videoId: string) => {
-    // TODO: Implement favorites functionality
-    console.log('Toggle favorite:', videoId);
+    console.log("Toggle favorite:", videoId);
   };
 
   const handleShare = (videoId: string) => {
-    // TODO: Implement share functionality
-    console.log('Share video:', videoId);
+    console.log("Share video:", videoId);
   };
 
   if (isLoading && videos.length === 0) {
@@ -68,7 +66,7 @@ export default function SearchResults({
           </div>
           <Skeleton className="h-8 w-32" />
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 8 }).map((_, index) => (
             <Card key={index} className="overflow-hidden">
@@ -96,8 +94,12 @@ export default function SearchResults({
         <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
           <Grid className="w-8 h-8 text-gray-400" />
         </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">No videos found</h3>
-        <p className="text-gray-600">Try adjusting your search terms or filters</p>
+        <h3 className="text-xl font-semibold text-gray-800 mb-2">
+          No videos found
+        </h3>
+        <p className="text-gray-600">
+          Try adjusting your search terms or filters
+        </p>
       </div>
     );
   }
@@ -108,32 +110,32 @@ export default function SearchResults({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button
-            variant={viewMode === 'grid' ? 'default' : 'outline'}
+            variant={viewMode === "grid" ? "default" : "outline"}
             size="sm"
-            onClick={() => onViewModeChange('grid')}
+            onClick={() => onViewModeChange("grid")}
           >
             <Grid className="w-4 h-4" />
           </Button>
           <Button
-            variant={viewMode === 'list' ? 'default' : 'outline'}
+            variant={viewMode === "list" ? "default" : "outline"}
             size="sm"
-            onClick={() => onViewModeChange('list')}
+            onClick={() => onViewModeChange("list")}
           >
             <List className="w-4 h-4" />
           </Button>
         </div>
-        
-        <p className="text-sm text-gray-600">
-          {videos.length} videos found
-        </p>
+
+        <p className="text-sm text-gray-600">{videos.length} videos found</p>
       </div>
 
       {/* Results Grid */}
-      <div className={
-        viewMode === 'grid'
-          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
-          : 'space-y-4'
-      }>
+      <div
+        className={
+          viewMode === "grid"
+            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            : "space-y-4"
+        }
+      >
         {videos.map((video) => (
           <VideoCard
             key={video.id}
@@ -159,7 +161,7 @@ export default function SearchResults({
                 Loading...
               </>
             ) : (
-              'Load More Videos'
+              "Load More Videos"
             )}
           </Button>
         </div>

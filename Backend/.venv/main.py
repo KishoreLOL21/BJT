@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 import schemas as S
 import models
@@ -6,6 +6,12 @@ from database import engine, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
 import bcrypt
 from models import Login_Info
+import requests
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 models.Base.metadata.create_all(bind=engine)
@@ -24,6 +30,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 @app.post("/sign-up")
 def sign_up(request: S.User, db: Session = Depends(get_db)):
@@ -95,4 +103,35 @@ def reset_password(request: S.ResetPasswordRequest, db: Session = Depends(get_db
 
     db.commit()
     return {"message": "Password updated successfully."}
+
+@app.get("/api/videos")
+def get_videos(query: str = Query(..., min_length=1), published_within: int = 180):
+    published_after = (datetime.now() - timedelta(days=published_within)).isoformat("T") + "Z"
+
+    search_url = (
+        "https://www.googleapis.com/youtube/v3/search?"
+        f"part=snippet&q={query}&type=video&maxResults=10"
+        f"&publishedAfter={published_after}&key={YOUTUBE_API_KEY}"
+    )
+
+    search_response = requests.get(search_url)
+    search_data = search_response.json()
+
+    video_ids = [item['id']['videoId'] for item in search_data.get("items", [])]
+
+    if not video_ids:
+        return {"items": []}
+
+    video_url = (
+        "https://www.googleapis.com/youtube/v3/videos?"
+        f"part=snippet,contentDetails,statistics"
+        f"&id={','.join(video_ids)}"
+        f"&key={YOUTUBE_API_KEY}"
+    )
+
+    video_response = requests.get(video_url)
+    video_data = video_response.json()
+
+    return {"items": video_data.get("items", [])}
+
 

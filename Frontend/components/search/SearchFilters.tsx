@@ -28,6 +28,7 @@ interface SearchFiltersProps {
   isOpen: boolean;
   onClose: () => void;
   onFiltersChange: (filters: FilterOptions) => void;
+  filters: FilterOptions;
 }
 
 export default function SearchFilters({ isOpen, onClose, onFiltersChange }: SearchFiltersProps) {

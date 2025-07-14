@@ -1,91 +1,131 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Filter, Heart, Plus, Share2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import SearchFilters from "@/components/search/SearchFilters";
-import SearchResults from "@/components/search/SearchResults";
 import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
+import VideoModal from "@/components/video/VideoModal";
 
-const mockVideos = [
-  {
-    id: "1",
-    title: "How to Build a React App from Scratch",
-    channel: "WebDev Pro",
-    thumbnail:
-      "https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "15:32",
-    views: "125K",
-    publishedAt: "2024-01-15T10:00:00Z",
-    description:
-      "Learn how to build a complete React application from scratch with modern tools and best practices.",
-  },
-  {
-    id: "2",
-    title: "JavaScript ES6 Features You Need to Know",
-    channel: "Code Masters",
-    thumbnail:
-      "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "22:15",
-    views: "89K",
-    publishedAt: "2024-01-14T14:30:00Z",
-    description:
-      "Master the essential ES6 features that every JavaScript developer should know.",
-  },
-  {
-    id: "3",
-    title: "CSS Grid vs Flexbox - Which One to Use?",
-    channel: "Frontend Focus",
-    thumbnail:
-      "https://images.pexels.com/photos/1181244/pexels-photo-1181244.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "18:45",
-    views: "67K",
-    publishedAt: "2024-01-13T09:15:00Z",
-    description:
-      "Compare CSS Grid and Flexbox to understand when to use each layout system.",
-  },
-  {
-    id: "4",
-    title: "Node.js Backend Development Tutorial",
-    channel: "Server Side",
-    thumbnail:
-      "https://images.pexels.com/photos/1181467/pexels-photo-1181467.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "35:20",
-    views: "156K",
-    publishedAt: "2024-01-12T16:45:00Z",
-    description:
-      "Build a complete backend API with Node.js, Express, and MongoDB.",
-  },
-  {
-    id: "5",
-    title: "TypeScript for Beginners",
-    channel: "Type Safe",
-    thumbnail:
-      "https://images.pexels.com/photos/1181271/pexels-photo-1181271.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "28:10",
-    views: "94K",
-    publishedAt: "2024-01-11T11:20:00Z",
-    description:
-      "Get started with TypeScript and learn why it's essential for modern JavaScript development.",
-  },
-  {
-    id: "6",
-    title: "Database Design Best Practices",
-    channel: "Data Guru",
-    thumbnail:
-      "https://images.pexels.com/photos/1181316/pexels-photo-1181316.jpeg?auto=compress&cs=tinysrgb&w=400",
-    duration: "42:33",
-    views: "78K",
-    publishedAt: "2024-01-10T13:00:00Z",
-    description: "Learn the fundamentals of database design and normalization.",
-  },
-];
+type Video = {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    channelTitle: string;
+    publishedAt: string;
+    thumbnails: {
+      high: { url: string };
+    };
+  };
+  statistics: {
+    viewCount: string;
+  };
+  contentDetails: {
+    duration: string;
+  };
+};
+
+type FilterOptions = {
+  duration: { min: number; max: number };
+  uploadDate: string;
+  sortBy: string;
+  quality: string[];
+  language: string;
+  channelType: string;
+  features: string[];
+};
+
+function parseISODuration(duration: string) {
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return "";
+  const hours = parseInt(match[1] || "0");
+  const minutes = parseInt(match[2] || "0");
+  const seconds = parseInt(match[3] || "0");
+  return hours
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
+        2,
+        "0"
+      )}`
+    : `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function getRelativeTime(publishedAt: string | number | Date) {
+  const publishedDate = new Date(publishedAt);
+  const now = new Date();
+  const diff = Math.floor((now.getTime() - publishedDate.getTime()) / 1000);
+  const units: [number, string][] = [
+    [60, "second"],
+    [3600, "minute"],
+    [86400, "hour"],
+    [2592000, "day"],
+    [31104000, "month"],
+    [Infinity, "year"],
+  ];
+  for (let i = 0; i < units.length; i++) {
+    if (diff < units[i][0]) {
+      const value = Math.floor(diff / (units[i - 1]?.[0] || 1));
+      return `${value} ${units[i - 1]?.[1]}${value !== 1 ? "s" : ""} ago`;
+    }
+  }
+  return "";
+}
 
 export default function SearchPage() {
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState<string>(
+    searchParams.get("q") || ""
+  );
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [filters, setFilters] = useState<FilterOptions>({
+    duration: { min: 0, max: 3600 },
+    uploadDate: "any",
+    sortBy: "relevance",
+    quality: [],
+    language: "any",
+    channelType: "any",
+    features: [],
+  });
+  const [hasMore, setHasMore] = useState(true);
+  const [monthsAgo, setMonthsAgo] = useState(6);
+
+  const performSearch = async () => {
+    if (!searchQuery.trim()) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch(
+        `http://localhost:8000/api/videos?query=${encodeURIComponent(
+          searchQuery
+        )}&published_within=${monthsAgo}`
+      );
+      const data = await res.json();
+      setVideos(data.items || []);
+    } catch (err) {
+      console.error("Error fetching videos:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFiltersChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
+    performSearch();
+  };
+
+  const handleLoadMore = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setHasMore(false);
+  };
+
   const featuredMetrics = [
     {
       label: "Videos Discovered",
@@ -120,133 +160,105 @@ export default function SearchPage() {
     "Comedy",
   ];
 
-  const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
-  const [videos, setVideos] = useState(mockVideos);
-  const [isLoading, setIsLoading] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [filters, setFilters] = useState({
-    duration: { min: 0, max: 3600 },
-    uploadDate: "any",
-    sortBy: "relevance",
-    quality: [],
-    language: "any",
-    channelType: "any",
-    features: [],
-  });
-  const [hasMore, setHasMore] = useState(true);
-
-  const debouncedSearch = useCallback(
-    debounce((query: string) => {
-      if (query.trim()) {
-        performSearch(query);
-      } else {
-        setVideos(mockVideos);
-      }
-    }, 300),
-    []
-  );
-
-  const performSearch = async (query: string) => {
-    setIsLoading(true);
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      const filteredVideos = mockVideos.filter(
-        (video) =>
-          video.title.toLowerCase().includes(query.toLowerCase()) ||
-          video.channel.toLowerCase().includes(query.toLowerCase()) ||
-          video.description.toLowerCase().includes(query.toLowerCase())
-      );
-
-      setVideos(filteredVideos);
-    } catch (error) {
-      console.error("Search error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleFiltersChange = (newFilters: any) => {
-    setFilters(newFilters);
-    performSearch(searchQuery);
-  };
-
-  const handleLoadMore = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setHasMore(false);
-  };
-
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-  }, [searchQuery, debouncedSearch]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-6">Search Videos</h1>
-
-          {/* Search Bar */}
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search for videos, channels, or topics..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-4 py-4 text-lg bg-white/95 backdrop-blur-sm border-0 focus:ring-2 focus:ring-white/30 rounded-full"
-            />
-          </div>
-
-          {/* Filter Toggle */}
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <div className="relative w-full md:flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                type="text"
+                placeholder="Search for videos, channels, or topics..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-4 text-lg bg-white/95 border-0 focus:ring-2 focus:ring-white/30 rounded-full w-full"
+              />
+            </div>
+            <Button
+              onClick={performSearch}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6 py-3"
+            >
+              Search
+            </Button>
             <Button
               variant={showFilters ? "default" : "outline"}
               onClick={() => setShowFilters(!showFilters)}
               className="bg-white/10 border-white/20 text-white hover:bg-white/20"
             >
-              <Filter className="w-4 h-4 mr-2" />
-              Filters
+              <Filter className="w-4 h-4 mr-2" /> Filters
             </Button>
           </div>
         </div>
 
-        {/* Main Content */}
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-2xl">
-          {/* Search Filters */}
           <SearchFilters
             isOpen={showFilters}
             onClose={() => setShowFilters(false)}
             onFiltersChange={handleFiltersChange}
+            filters={filters}
           />
 
-          {/* Search Results */}
-          <SearchResults
-            videos={videos}
-            isLoading={isLoading}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            onLoadMore={handleLoadMore}
-            hasMore={hasMore}
-          />
+          {isLoading ? (
+            <div className="text-center text-gray-600 py-12">Loading...</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {videos.map((video) => {
+                const { id, snippet, statistics, contentDetails } = video;
+                const duration = parseISODuration(
+                  contentDetails?.duration || ""
+                );
+                const views = Number(
+                  statistics?.viewCount || 0
+                ).toLocaleString();
+                const publishedTime = getRelativeTime(snippet?.publishedAt);
+
+                return (
+                  <Card
+                    key={video.id.videoId}
+                    className="cursor-pointer hover:shadow-xl transition-all duration-200"
+                    onClick={() => setSelectedVideoId(video.id.videoId)}
+                  >
+                    <img
+                      src={snippet?.thumbnails?.high?.url}
+                      alt={snippet?.title}
+                      className="w-full h-48 object-cover"
+                    />
+                    <CardContent className="p-4">
+                      <h2 className="text-md font-semibold truncate">
+                        {snippet?.title}
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        {snippet?.channelTitle}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {views} views • {publishedTime} • {duration}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
+
+      <VideoModal
+        videoId={selectedVideoId}
+        onClose={() => setSelectedVideoId(null)}
+      />
+
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <CardContainer className="inter-var w-full">
           <CardBody className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden group/card w-full h-auto">
-            {/* Card Header */}
             <CardItem translateZ="50" className="text-center pb-8 pt-8 px-6">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">
                 Platform Statistics
               </h2>
               <p className="text-gray-600">See how our community is growing</p>
             </CardItem>
-
-            {/* Card Content - Metrics Grid */}
             <CardItem translateZ="40" className="px-6 pb-8">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 {featuredMetrics.map((metric, index) => (
@@ -347,15 +359,4 @@ export default function SearchPage() {
       </div>
     </div>
   );
-}
-
-function debounce<T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout;
-  return (...args: Parameters<T>) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  };
 }

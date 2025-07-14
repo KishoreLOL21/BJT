@@ -1,6 +1,6 @@
 "use client";
 
-import { Play } from "lucide-react";
+import { Boxes, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -12,9 +12,67 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useRouter } from "next/navigation";
+import LottieAnimation from "./LottieAnimation";
+import { BoxesCore } from "./ui/background-boxes";
+import { cn } from "@/lib/utils";
+import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
+import { FaPlay } from "react-icons/fa";
 
 export default function Home() {
   const router = useRouter();
+  const words = [
+    {
+      text: "Discover",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "Amazing",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "▶",
+      className: "text-white dark:text-white",
+    },
+    {
+      text: "YouTube",
+      className: "text-red-500 dark:text-red-500",
+    },
+    {
+      text: "Content",
+      className: "text-white-500 dark:text-white-500",
+    },
+  ];
+
+  const words_second = [
+    {
+      text: "all",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "in",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "one",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "Go!",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "Compiled",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "for",
+      className: "text-white-500 dark:text-white-500",
+    },
+    {
+      text: "Ease!!",
+      className: "text-white-500 dark:text-white-500",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600">
@@ -92,12 +150,15 @@ export default function Home() {
 
       {/* Body Section */}
       <div className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              Discover Amazing
-              <span className="block bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
-                YouTube Content
+        <BoxesCore />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="flex flex-col items-center justify-center text-center">
+            <h2 className={cn("md:text-5xl text-xl text-white relative z-20")}>
+              <TypewriterEffectSmooth words={words} />
+              <span
+                className={cn("md:text-5xl text-xl text-white relative z-20")}
+              >
+                <TypewriterEffectSmooth words={words_second} />
               </span>
             </h2>
             <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
@@ -110,7 +171,7 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <div className="bg-white/10 backdrop-blur-sm border-t border-white/20 mt-16">
+      <div className="bg-white/10 backdrop-blur-sm border-t border-white/20 mt-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
