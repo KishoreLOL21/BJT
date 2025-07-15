@@ -12,34 +12,47 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 import { useRouter } from "next/navigation";
-import LottieAnimation from "./LottieAnimation";
 import { BoxesCore } from "./ui/background-boxes";
 import { cn } from "@/lib/utils";
 import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
 import { FaPlay } from "react-icons/fa";
+import { CustomTypewriterEffect } from "./CustomTypeWriterEffect";
 
 export default function Home() {
   const router = useRouter();
   const words = [
     {
       text: "Discover",
-      className: "text-white-500 dark:text-white-500",
-    },
-    {
-      text: "Amazing",
-      className: "text-white-500 dark:text-white-500",
-    },
-    {
-      text: "▶",
       className: "text-white dark:text-white",
     },
     {
+      text: "Amazing",
+      className: "text-white dark:text-white",
+    },
+    {
+      text: (
+        <span className="inline-flex items-center justify-center ml-1 mr-1">
+          <span className="bg-[#FF0000] rounded-full w-6 h-6 flex items-center justify-center">
+            <svg
+              viewBox="0 0 24 24"
+              className="w-3 h-3 text-white ml-0.5"
+              fill="currentColor"
+            >
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </span>
+        </span>
+      ),
+      className: "inline-flex items-center",
+      delay: 200,
+    },
+    {
       text: "YouTube",
-      className: "text-red-500 dark:text-red-500",
+      className: "text-black-1000 dark:text-black-1000",
     },
     {
       text: "Content",
-      className: "text-white-500 dark:text-white-500",
+      className: "text-white dark:text-white",
     },
   ];
 
@@ -154,7 +167,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="flex flex-col items-center justify-center text-center">
             <h2 className={cn("md:text-5xl text-xl text-white relative z-20")}>
-              <TypewriterEffectSmooth words={words} />
+              <CustomTypewriterEffect
+                words={words}
+                cursorClassName="animate-blink"
+              />
               <span
                 className={cn("md:text-5xl text-xl text-white relative z-20")}
               >

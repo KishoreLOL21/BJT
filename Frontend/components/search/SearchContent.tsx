@@ -10,12 +10,14 @@ import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
 import VideoModal from "@/components/video/VideoModal";
+import SearchResults from "./SearchResults";
 
 type Video = {
   id: {
     videoId: string;
   };
   snippet: {
+    description: string;
     title: string;
     channelTitle: string;
     publishedAt: string;
@@ -40,41 +42,6 @@ type FilterOptions = {
   channelType: string;
   features: string[];
 };
-
-function parseISODuration(duration: string) {
-  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return "";
-  const hours = parseInt(match[1] || "0");
-  const minutes = parseInt(match[2] || "0");
-  const seconds = parseInt(match[3] || "0");
-  return hours
-    ? `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(
-        2,
-        "0"
-      )}`
-    : `${minutes}:${String(seconds).padStart(2, "0")}`;
-}
-
-function getRelativeTime(publishedAt: string | number | Date) {
-  const publishedDate = new Date(publishedAt);
-  const now = new Date();
-  const diff = Math.floor((now.getTime() - publishedDate.getTime()) / 1000);
-  const units: [number, string][] = [
-    [60, "second"],
-    [3600, "minute"],
-    [86400, "hour"],
-    [2592000, "day"],
-    [31104000, "month"],
-    [Infinity, "year"],
-  ];
-  for (let i = 0; i < units.length; i++) {
-    if (diff < units[i][0]) {
-      const value = Math.floor(diff / (units[i - 1]?.[0] || 1));
-      return `${value} ${units[i - 1]?.[1]}${value !== 1 ? "s" : ""} ago`;
-    }
-  }
-  return "";
-}
 
 export default function SearchPage() {
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
@@ -200,7 +167,7 @@ export default function SearchPage() {
             filters={filters}
           />
 
-          {isLoading ? (
+          {/* {isLoading ? (
             <div className="text-center text-gray-600 py-12">Loading...</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
@@ -240,7 +207,31 @@ export default function SearchPage() {
                 );
               })}
             </div>
-          )}
+          )} */}
+
+          <SearchResults
+            videos={videos.map((video) => ({
+              id: video.id.videoId,
+              title: video.snippet.title,
+              channel: video.snippet.channelTitle,
+              thumbnail: video.snippet.thumbnails.high.url,
+              duration: "N/A", 
+              views: "N/A", 
+              publishedAt: video.snippet.publishedAt,
+              description: video.snippet?.description ?? "",
+            }))}
+            isLoading={isLoading}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onLoadMore={() => {}}
+            hasMore={hasMore}
+            onVideoClick={(videoId) => setSelectedVideoId(videoId)}
+          />
+
+          <VideoModal
+            videoId={selectedVideoId}
+            onClose={() => setSelectedVideoId(null)}
+          />
         </div>
       </div>
 

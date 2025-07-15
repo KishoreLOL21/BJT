@@ -1,5 +1,3 @@
-"use client";
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface VideoModalProps {
@@ -14,7 +12,7 @@ export default function VideoModal({ videoId, onClose }: VideoModalProps) {
         {videoId && (
           <iframe
             src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-            title="YouTube video player"
+            title="YouTube Video"
             className="w-full h-full rounded-lg"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
