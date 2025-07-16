@@ -73,7 +73,7 @@ export default function SignUp() {
       if (response.ok) {
         setSavedData(payload);
         toast.success("Account Created Successfully");
-        router.push("/search");
+        router.push("/user-info");
       } else {
         alert(data.detail || "Failed to create account.");
       }

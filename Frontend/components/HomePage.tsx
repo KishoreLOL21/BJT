@@ -169,7 +169,6 @@ export default function Home() {
             <h2 className={cn("md:text-5xl text-xl text-white relative z-20")}>
               <CustomTypewriterEffect
                 words={words}
-                cursorClassName="animate-blink"
               />
               <span
                 className={cn("md:text-5xl text-xl text-white relative z-20")}

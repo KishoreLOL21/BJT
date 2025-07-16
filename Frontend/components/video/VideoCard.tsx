@@ -10,6 +10,7 @@ interface VideoCardProps {
     views: string;
     publishedAt: string;
     description?: string;
+    onClick?: () => void;
   };
   onAddToPlaylist?: (videoId: string) => void;
   onToggleFavorite?: (videoId: string) => void;
@@ -20,7 +21,11 @@ interface VideoCardProps {
 export default function VideoCard({ video, onClick }: VideoCardProps) {
   return (
     <Card onClick={onClick} className="cursor-pointer hover:shadow-lg">
-      <img src={video.thumbnail} alt={video.title} className="w-full h-48 object-cover" />
+      <img
+        src={video.thumbnail}
+        alt={video.title}
+        className="w-full h-48 object-cover"
+      />
       <CardContent className="p-4">
         <h2 className="text-md font-semibold truncate">{video.title}</h2>
         <p className="text-sm text-gray-500">{video.channel}</p>

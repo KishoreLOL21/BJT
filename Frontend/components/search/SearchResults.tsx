@@ -35,6 +35,7 @@ export default function SearchResults({
   onViewModeChange,
   onLoadMore,
   hasMore,
+  onVideoClick,
 }: SearchResultsProps) {
   const [loadingMore, setLoadingMore] = useState(false);
 
@@ -143,6 +144,7 @@ export default function SearchResults({
             onAddToPlaylist={handleAddToPlaylist}
             onToggleFavorite={handleToggleFavorite}
             onShare={handleShare}
+            onClick={() => onVideoClick(video.id)} 
           />
         ))}
       </div>

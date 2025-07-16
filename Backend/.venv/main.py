@@ -1,15 +1,19 @@
+import secrets
+import string
 from fastapi import FastAPI, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 import schemas as S
 import models
 from database import engine, SessionLocal
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer   
 import bcrypt
 from models import Login_Info
 import requests
 from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
+import httpx
 
 load_dotenv()
 
@@ -104,6 +108,136 @@ def reset_password(request: S.ResetPasswordRequest, db: Session = Depends(get_db
     db.commit()
     return {"message": "Password updated successfully."}
 
+load_dotenv()
+
+app = FastAPI()
+models.Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+
+@app.post("/sign-up")
+def sign_up(request: S.User, db: Session = Depends(get_db)):
+    existing_user = db.query(models.User_Info).filter(models.User_Info.userName == request.userName).first()
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already exists. Please choose another one."
+        )
+
+    hashed_pw = bcrypt.hashpw(request.password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+    user = models.User_Info(
+        firstName=request.firstName,
+        lastName=request.lastName,
+        email=request.email,
+        phoneNo=request.phoneNo,
+        countryCode=request.countryCode,
+        userName=request.userName,
+        password=hashed_pw
+    )
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return {"message": "User Info Saved", "user_id": user.user_id}
+
+@app.post("/login")
+def login(request: S.LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User_Info).filter(models.User_Info.userName == request.userName).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User does not exist. Please sign up first."
+        )
+
+    if not bcrypt.checkpw(request.password.encode("utf-8"), user.password.encode("utf-8")):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password."
+        )
+
+    login_log = Login_Info(user_id=user.user_id)
+    db.add(login_log)
+    db.commit()
+
+    return {
+        "message": "Login successful",
+        "user_id": user.user_id,
+        "login_time": login_log.login_time,
+        "userName": user.userName,
+        "firstName": user.firstName,
+        "lastName": user.lastName
+    }
+    
+@app.get("/user-info/{user_id}")
+def get_user_info(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(models.Login_Info).filter(models.Login_Info.user_id == user_id).first()
+    user_name = db.query(models.User_Info).filter(models.User_Info.user_id == user)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {
+        "user_id": user_name.user_id,
+        "userName": user_name.userName,
+        "firstName": user_name.firstName,
+        "lastName": user_name.lastName,
+        "email": user_name.email
+    }
+    
+reset_tokens = {}
+
+@app.post("/forgot-password")
+async def forgot_password(request: S.ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User_Info).filter(models.User_Info.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found.")
+
+    token = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(32))
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+    reset_tokens[token] = {"user_id": user.user_id, "expires_at": expires_at}
+
+    reset_link = f"http://localhost:3000/reset-password?token={token}"
+    print(f"\n=== RESET LINK ===\n{reset_link}\nLink expires at {expires_at}.\n")
+
+    return {"message": "Password reset link has been sent to your email."}
+
+@app.post("/reset-password")
+async def reset_password(request: S.ResetPasswordRequest, db: Session = Depends(get_db)):
+    token_data = reset_tokens.get(request.token)
+
+    if not token_data or token_data["expires_at"] < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Invalid or expired token")
+
+    user_id = token_data["user_id"]
+
+    login_record = db.query(models.Login_Info).filter(models.Login_Info.user_id == user_id).first()
+    if not login_record:
+        raise HTTPException(status_code=404, detail="Login record not found")
+
+    hashed_pw = bcrypt.hashpw(request.newPassword.encode(), bcrypt.gensalt()).decode()
+    login_record.password = hashed_pw
+    db.commit()
+
+    del reset_tokens[request.token]
+
+    return {"message": "Password updated successfully"}
+
 @app.get("/api/videos")
 def get_videos(query: str = Query(..., min_length=1), published_within: int = 180):
     published_after = (datetime.now() - timedelta(days=published_within)).isoformat("T") + "Z"
@@ -134,4 +268,18 @@ def get_videos(query: str = Query(..., min_length=1), published_within: int = 18
 
     return {"items": video_data.get("items", [])}
 
+@app.get("/search")
+async def search_videos(q: str = Query(...)):
+    async with httpx.AsyncClient() as client:
+        response = await client.get(
+            "https://www.googleapis.com/youtube/v3/search",
+            params={
+                "part": "snippet",
+                "q": q,
+                "type": "video",
+                "key": YOUTUBE_API_KEY,
+                "maxResults": 10
+            }
+        )
+    return response.json()
 

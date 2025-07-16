@@ -43,7 +43,8 @@ export default function Login() {
       if (response.ok) {
         setSavedData(payload);
         toast.success("Login successful!");
-        router.push("/search");
+        localStorage.setItem("userName", userName);
+        router.push("/user-info");
       } else {
         if (data.detail === "User does not exist. Please sign up first.") {
           toast.error(data.detail);
