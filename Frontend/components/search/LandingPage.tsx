@@ -3,12 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import { Search, Filter, Heart, Plus, Share2, User } from "lucide-react";
+import { Search, Filter, Heart, Plus, Share2, User, Boxes, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Boxes, Play } from "lucide-react";
 
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
