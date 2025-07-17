@@ -96,85 +96,88 @@ export default function VideoSearch() {
 
   return (
     <div className="flex min-h-screen bg-gradient-to-tr from-orange-400 via-pink-500 to-pink-600">
-      {/* Main content, pushed right by fixed sidebar width */}
       <main className="flex-1 ml-[80px] flex flex-col items-center w-full px-2 sm:px-0">
-        <h1 className="text-4xl font-bold mb-8 mt-10 text-white text-center">
-          Search Videos
-        </h1>
-        {/* Search Input/Buttons: Modern layout */}
-        <div className="flex flex-row gap-6 mb-8 justify-center w-full">
-          <div className="flex items-center bg-white rounded-full shadow px-4 py-2 w-[320px] max-w-full">
-            <Search className="text-gray-400 mr-2" size={24} />
-            <input
-              type="text"
-              placeholder="integration"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="bg-transparent outline-none text-gray-800 w-full text-lg"
+        <div className="w-full max-w-6xl mx-auto px-4 flex flex-col items-center">
+          <h1 className="text-4xl font-bold mb-8 mt-10 text-white text-center">
+            Search Videos
+          </h1>
+          {/* Search Input/Buttons: Modern layout */}
+          <div className="flex flex-row gap-6 mb-8 justify-center w-full">
+            <div className="flex items-center bg-white rounded-full shadow px-4 py-2 w-[320px] max-w-full">
+              <Search className="text-gray-400 mr-2" size={24} />
+              <input
+                type="text"
+                placeholder="integration"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                className="bg-transparent outline-none text-gray-800 w-full text-lg"
+              />
+            </div>
+            <button
+              onClick={handleSearch}
+              className="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold text-lg px-8 py-2 rounded-full shadow"
+            >
+              Search
+            </button>
+            <button
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              className="bg-pink-600 hover:bg-pink-700 transition-colors text-white font-semibold text-lg px-8 py-2 rounded-full shadow flex items-center gap-2"
+            >
+              <Filter size={20} />
+              Filters
+            </button>
+          </div>
+          {/* Filters Panel */}
+          <SearchFilters
+            isOpen={filtersOpen}
+            onClose={() => setFiltersOpen(false)}
+            onFiltersChange={handleFiltersChange}
+            filters={appliedFilters}
+          />
+          {/* Search Results */}
+          <div className="w-full">
+            <SearchResults
+              videos={videos.map((v) => ({
+                id: v.id.videoId,
+                title: v.snippet.title,
+                channel: v.snippet.channelTitle,
+                thumbnail: v.snippet.thumbnails.medium.url,
+                duration: "N/A",
+                views: "N/A",
+                publishedAt: v.snippet.publishedAt,
+                description: v.snippet.description ?? "",
+              }))}
+              isLoading={isLoading}
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              onLoadMore={handleLoadMore}
+              hasMore={hasMore}
+              onVideoClick={setSelectedVideoId}
             />
           </div>
-          <button
-            onClick={handleSearch}
-            className="bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold text-lg px-8 py-2 rounded-full shadow"
-          >
-            Search
-          </button>
-          <button
-            onClick={() => setFiltersOpen(!filtersOpen)}
-            className="bg-pink-600 hover:bg-pink-700 transition-colors text-white font-semibold text-lg px-8 py-2 rounded-full shadow flex items-center gap-2"
-          >
-            <Filter size={20} />
-            Filters
-          </button>
-        </div>
-        {/* Filters Panel */}
-        <SearchFilters
-          isOpen={filtersOpen}
-          onClose={() => setFiltersOpen(false)}
-          onFiltersChange={handleFiltersChange}
-          filters={appliedFilters}
-        />
-        {/* Search Results */}
-        <SearchResults
-          videos={videos.map((v) => ({
-            id: v.id.videoId,
-            title: v.snippet.title,
-            channel: v.snippet.channelTitle,
-            thumbnail: v.snippet.thumbnails.medium.url,
-            duration: "N/A",
-            views: "N/A",
-            publishedAt: v.snippet.publishedAt,
-            description: v.snippet.description ?? "",
-          }))}
-          isLoading={isLoading}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          onLoadMore={handleLoadMore}
-          hasMore={hasMore}
-          onVideoClick={setSelectedVideoId}
-        />
-        {/* Player Modal */}
-        {selectedVideoId && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
-            <div className="relative w-[90%] md:w-[70%] h-[70%] bg-black">
-              <iframe
-                width="100%"
-                height="100%"
-                src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1`}
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
-                className="rounded-lg"
-              ></iframe>
-              <button
-                onClick={() => setSelectedVideoId(null)}
-                className="absolute top-2 right-2 text-white text-3xl font-bold"
-              >
-                ✕
-              </button>
+          {/* Player Modal */}
+          {selectedVideoId && (
+            <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
+              <div className="relative w-[90%] md:w-[70%] h-[70%] bg-black">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={`https://www.youtube.com/embed/${selectedVideoId}?autoplay=1`}
+                  frameBorder="0"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                  className="rounded-lg"
+                ></iframe>
+                <button
+                  onClick={() => setSelectedVideoId(null)}
+                  className="absolute top-2 right-2 text-white text-3xl font-bold"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
     </div>
   );

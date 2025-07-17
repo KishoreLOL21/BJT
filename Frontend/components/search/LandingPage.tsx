@@ -9,7 +9,6 @@ import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "@/components/ui/badge";
 
-import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
   IconBrandTabler,
@@ -137,39 +136,6 @@ export default function SearchPage() {
         "h-[100vh]"
       )}
     >
-      {/* Sidebar */}
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="bg-gradient-to-b from-black via-violet-800 to-blue-800 text-white justify-between gap-10">
-          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-            {open ? <Logo /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink
-                  key={idx}
-                  link={{
-                    ...link,
-                    icon: React.cloneElement(link.icon, {
-                      className: "h-5 w-5 shrink-0 text-white",
-                    }),
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: userInfo
-                  ? `${userInfo.firstName} ${userInfo.lastName}`
-                  : "User",
-                href: "#",
-                icon: <User className="h-7 w-7 text-white" />,
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </Sidebar>
-
       {/* Main Content */}
       <div className="flex flex-col flex-1 overflow-y-auto p-6 bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600">
         <h1 className="text-4xl font-bold text-white mb-6">
