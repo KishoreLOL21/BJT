@@ -14,6 +14,11 @@ from datetime import datetime, timedelta
 import os
 from dotenv import load_dotenv
 import httpx
+from fastapi import UploadFile, File
+import PyPDF2
+from docx import Document
+import re
+import io
 
 load_dotenv()
 
@@ -283,3 +288,38 @@ async def search_videos(q: str = Query(...)):
         )
     return response.json()
 
+def extract_modules_and_topics(text: str) -> str:
+    module_pattern = r"(Module\s*[-:]?\s*\d+)"
+    topic_pattern = r"(?:Topic\s*[-:]?\s*\d+|\•|\-|\d+\.)\s*(.*)"
+
+    modules = re.split(module_pattern, text, flags=re.IGNORECASE)
+    output = ""
+    
+    for i in range(1, len(modules), 2):  
+        module_title = modules[i].strip()
+        module_content = modules[i + 1].strip()
+
+        output += f"\n{module_title}:\n"
+        topics = re.findall(topic_pattern, module_content, flags=re.IGNORECASE)
+        for idx, topic in enumerate(topics, start=1):
+            if topic.strip():
+                output += f"  Topic - {idx}: {topic.strip()}\n"
+    return output
+
+@app.post("/upload-syllabus")
+async def upload_syllabus(file: UploadFile = File(...)):
+    contents = await file.read()
+
+    text = ""
+    if file.filename.endswith(".pdf"):
+        reader = PyPDF2.PdfReader(io.BytesIO(contents))
+        text = "\n".join([page.extract_text() or "" for page in reader.pages])
+    elif file.filename.endswith(".docx"):
+        doc = Document(io.BytesIO(contents))
+        text = "\n".join([para.text for para in doc.paragraphs])
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported file type.")
+
+    module_structure = extract_modules_and_topics(text)
+
+    return {"module_structure": module_structure}

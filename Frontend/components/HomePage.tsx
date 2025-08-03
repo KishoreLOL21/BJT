@@ -16,10 +16,13 @@ import { BoxesCore } from "./ui/background-boxes";
 import { cn } from "@/lib/utils";
 import { TypewriterEffectSmooth } from "./ui/typewriter-effect";
 import { FaPlay } from "react-icons/fa";
-import { CustomTypewriterEffect } from "./CustomTypeWriterEffect";
+import { useState, useEffect } from "react"; 
 
 export default function Home() {
   const router = useRouter();
+  const [showFirstLine, setShowFirstLine] = useState(true);
+  const [showSecondLine, setShowSecondLine] = useState(false);
+
   const words = [
     {
       text: "Discover",
@@ -28,23 +31,6 @@ export default function Home() {
     {
       text: "Amazing",
       className: "text-white dark:text-white",
-    },
-    {
-      text: (
-        <span className="inline-flex items-center justify-center ml-1 mr-1">
-          <span className="bg-[#FF0000] rounded-full w-6 h-6 flex items-center justify-center">
-            <svg
-              viewBox="0 0 24 24"
-              className="w-3 h-3 text-white ml-0.5"
-              fill="currentColor"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </span>
-        </span>
-      ),
-      className: "inline-flex items-center",
-      delay: 200,
     },
     {
       text: "YouTube",
@@ -86,6 +72,15 @@ export default function Home() {
       className: "text-white-500 dark:text-white-500",
     },
   ];
+
+  useEffect(() => {
+    // After first line completes, show second line
+    const timer = setTimeout(() => {
+      setShowSecondLine(true);
+    }, words.length * 200 + 1000); // Adjust timing based on your needs
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-pink-500 to-purple-600">
@@ -163,18 +158,16 @@ export default function Home() {
 
       {/* Body Section */}
       <div className="relative overflow-hidden">
-        <BoxesCore />
+        <BoxesCore className="z--2"/>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="flex flex-col items-center justify-center text-center">
             <h2 className={cn("md:text-5xl text-xl text-white relative z-20")}>
-              <CustomTypewriterEffect
-                words={words}
-              />
-              <span
-                className={cn("md:text-5xl text-xl text-white relative z-20")}
-              >
-                <TypewriterEffectSmooth words={words_second} />
-              </span>
+              <TypewriterEffectSmooth words={words} />
+              {showSecondLine && (
+                <span className={cn("md:text-5xl text-xl text-white relative z-20 block mt-4")}>
+                  <TypewriterEffectSmooth words={words_second} />
+                </span>
+              )}
             </h2>
             <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto">
               Search, filter, and organize YouTube videos with powerful tools.
